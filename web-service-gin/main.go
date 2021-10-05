@@ -198,7 +198,7 @@ func updateWorkload(c *gin.Context) {
 //adding into slice via CMD ...... ONLY CMD!!!!!!! - with arrays
 // curl http://localhost:8080/courses --include --Header "Content-Type:application/json" --request "POST" --data "{\"id\": 4, \"name\": \"The Modern Sound of Betty Carter\", \"teachers\":[\"Betty-Carter\",\"kurt\"], \"students\":[\"Heino\",\"kent\"]}"
 
-//DELETE STUDENT USIGN CMD
+//DELETE STUDENT USING CMD
 // curl http://localhost:8080/courses/student/2/Henning --Header "Content-Type:application/json" --request "DELETE"
 
 //DELETE TEACHER USING CMD
@@ -207,7 +207,7 @@ func updateWorkload(c *gin.Context) {
 // ENROLL STUDENT TO COURSE USING CMD
 // curl http://localhost:8080/courses/student/2/HOLGER --Header "Content-Type:application/json" --request "POST"
 
-// ENROLL TEACHER TO COUSE USING CMD
+// ENROLL TEACHER TO COURSE USING CMD
 // curl http://localhost:8080/courses/teacher/2/Jytte --Header "Content-Type:application/json" --request "POST"
 
 // UPDATE COURSE SCORE USING CMD
