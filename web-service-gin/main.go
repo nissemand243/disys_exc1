@@ -50,9 +50,29 @@ func postCourse(c *gin.Context) {
 		return
 	}
 
-	// Add the new course to the slice.
-	courses = append(courses, newCourse)
-	c.IndentedJSON(http.StatusCreated, newCourse)
+	//check if course allready exists in the server
+	if check(newCourse) {
+
+		c.IndentedJSON(http.StatusAlreadyReported, "Course allready exists")
+	} else {
+		// Add the new course to the slice.
+		courses = append(courses, newCourse)
+		c.IndentedJSON(http.StatusCreated, newCourse)
+	}
+
+}
+
+func check(newCourse course) bool {
+	var checkBool bool
+	for _, a := range courses {
+		if a.ID == newCourse.ID && a.Name == newCourse.Name {
+			checkBool = true
+			break
+		} else {
+			checkBool = false
+		}
+	}
+	return checkBool
 }
 
 // getCourseByID locates the course whose ID value matches the id
