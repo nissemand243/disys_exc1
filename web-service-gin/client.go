@@ -15,8 +15,8 @@ router.GET("/courses", getCourses)
 	router.POST("/courses/teacher/:id/:name", addTeacher)
 */
 func main() {
-	getCourses()
 	postCourse()
+	getCourses()
 }
 
 func getCourses() {
