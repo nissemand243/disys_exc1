@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+package couse;
+
+option go_package = "example.com/go-course-grpc;go_course_grpc";
+
+/*
+protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative course/course.proto
+*/
+service CourseService {
+    rpc PostCourse(NewCourse) returns (Course) {}
+
+    /*rpc PostCourse(NewCourse) returns (stream CourseId) {}
+    rpc GetCourse(CourseId) returns (Course) {}
+    rpc GetSaticfactoryScore(CourseId) returns (SatsfactoryScore) {}
+    rpc PostAssignTeacher(TeacherId) returns (stream TeacherId) {}
+    rpc DeleteDeassignTeacher(TeacherId) returns (stream TeacherId) {}
+    rpc PostEnrollStudent(StudentId) returns (stream StudentId) {}
+    rpc DeleteDeenrollStudent(StudentId) returns (stream StudentId) {}
+    rpc PutWorkload(Workload) returns (RequestCompleted) {}*/
+
+    // -Post: Create a Course (CourseID, name, ECTS, Teacher[ ], Student[ ])\\
+    // -Get: Get CourseID\\
+    // -Get: Satisfactory score\\
+    // -Post: Assign Course Teacher (TeacherID)\\
+    // -Delete: Course Teacher (TeacherID)\\
+    // -Post: Enroll student (StudentID)\\
+    // -Delete: Student (StudentID)\\
+    // -Put: Workload (ECTS)\\
+}
+
+
+message NewCourse {
+    string name = 1;
+    repeated string students = 2;
+    repeated string teachers = 3;
+    int32 workload = 4;
+}
+
+message Course {
+    string name = 1;
+    repeated string students = 2;
+    repeated string teachers = 3;
+    int32 workload = 4;
+    int32 score = 5;
+    int32 course_id = 6;
+}
+
+/*
+message NewCourse {
+    string name = 1;
+    repeated StudentId students = 2;
+    repeated TeacherId teachers = 3;
+    int32 workload = 4;
+}
+
+message Course {
+    string name = 1;
+    repeated StudentId students = 2;
+    repeated TeacherId teachers = 3;
+    Workload workload = 4;
+    SatsfactoryScore score = 5;
+    int32 id = 6;
+}
+
+
+message StudentId {
+    int32 id = 1;
+}
+message Student {
+    StudentId id = 1;
+    string name = 2;
+}
+
+message TeacherId {
+    int32 id = 1;
+}
+message Teacher {
+    TeacherId id = 1;
+    string name = 2;
+}
+
+
+
+message Workload {
+    int32 ects = 1;
+}
+message SatsfactoryScore {
+    int32 score = 1;
+}
+
+
+
+message RequestCompleted {
+    string m = 1;
+}
+*/
