@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	pb "gRPC/course"
 	"google.golang.org/grpc"
 	"log"
-	"time"
 )
 
 const (
@@ -19,19 +19,31 @@ func main() {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	client := NewCourseProtoClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-	course, err := client.PostCourse(ctx, &Course{
+	client := pb.NewCourseProtoClient(conn)
+
+	SendPostCourseRequest(client)
+	SendGetCourseRequest(client)
+}
+
+func SendPostCourseRequest(client pb.CourseProtoClient) {
+	course := pb.Course{
 		CourseId:          1,
 		Name:              "DØSYS",
 		Workload:          15,
 		SatisfactoryScore: 10,
 		Teachers:          []string{"Tom"},
 		Students:          []string{"Bente"},
-	})
-	if err != nil {
-		log.Fatal(err)
 	}
-	log.Printf("Course: %s", course.GetMessage())
+	log.Printf("Course: %s added to courses", course.Name)
+}
+
+func SendGetCourseRequest(client pb.CourseProtoClient) {
+	msg := pb.GetCourseRequest{}
+
+	resp, err := client.GetCourse(context.Background(), &msg)
+	if err != nil {
+		log.Fatalf("Error when using GetCourse: %s", err)
+	}
+
+	log.Printf("Server responeded with: %s \n", resp)
 }

@@ -1,4 +1,4 @@
-module example/web-service-gin
+module gRPC
 
 go 1.17
 
