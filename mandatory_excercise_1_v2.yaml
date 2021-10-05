@@ -1,0 +1,427 @@
+swagger: "2.0"
+info:
+  description: "This is Sparta"
+  version: "1.0.0"
+  title: "Mandatory_Exercise_1"
+basePath: "/v2"
+tags:
+- name: "Teacher"
+  description: "Teacher of a Coures"
+- name: "Student"
+  description: "Student on a Coures"
+- name: "Course"
+  description: "A Coures with Teachers and Students"
+schemes:
+- "https"
+- "http"
+paths:
+  /Course:
+    post:
+      tags:
+      - "Course"
+      summary: "Create a new Course"
+      description: ""
+      operationId: "CreateCourse"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "The Parameters of a Course"
+        required: true
+        schema:
+          $ref: "#/definitions/Course"
+      responses:
+        "405":
+          description: "Invalid input"
+    get:
+      tags:
+      - "Course"
+      summary: "Get the Course Satisfactory score"
+      description: ""
+      operationId: "Satisfactoryscore"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SatisfactoryScore"
+        in: "query"
+        description: "the Course Satisfactory score"
+        required: true
+        type: "number"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "number"
+        "400":
+          description: "No Satisfactory score"
+  /Course/{CourseID}:
+    get:
+      tags:
+      - "Course"
+      summary: "Find Course by ID"
+      description: "Returns a single Course"
+      operationId: "getCourseById"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "CourseID"
+        in: "path"
+        description: "ID of Course to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Course"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Course not found"
+  /Course/Teacher/{TeacherID}:
+    post:
+      tags:
+      - "Course"
+      summary: "Adds a Teacher to the Course"
+      description: ""
+      operationId: "AssignTeacher"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "TeacherID"
+        in: "path"
+        description: "ID of Teacher that needs to be added"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "405":
+          description: "Invalid input"
+    delete:
+      tags:
+      - "Course"
+      summary: "Deletes a Teacher from Course"
+      description: ""
+      operationId: "DeleteTeacher"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "TeacherID"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "TeacherID"
+        in: "path"
+        description: "Teacher id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Teacher not found"
+  /Course/Student/{StudentID}:
+    post:
+      tags:
+      - "Course"
+      summary: "Enroll a Student to the Course"
+      description: ""
+      operationId: "AssignStudent"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "StudentID"
+        in: "path"
+        description: "ID of Student that needs to be added to the Course"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "405":
+          description: "Invalid input"
+    delete:
+      tags:
+      - "Course"
+      summary: "Deletes a Student from Course"
+      description: ""
+      operationId: "DeleteStudent"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "StudentID"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "StudentID"
+        in: "path"
+        description: "Student id to remove from Course"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Student not found"
+  /Course/ECTS/{ECTS}:
+   put:
+      tags:
+      - "Course"
+      summary: "Updated Course ECTS"
+      description: ""
+      operationId: "updateECTS"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "ECTS"
+        in: "path"
+        description: "ECTS that need to be updated"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Updated user object"
+        required: true
+        schema:
+          $ref: "#/definitions/Course"
+      responses:
+        "400":
+          description: "Invalid user supplied"
+        "404":
+          description: "User not found"
+  /Teacher:
+    post:
+      tags:
+      - "Teacher"
+      summary: "Create a new Teacher"
+      description: ""
+      operationId: "CreateTeacher"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "The Parameters of a Teacher"
+        required: true
+        schema:
+          $ref: "#/definitions/Teacher"
+      responses:
+        "405":
+          description: "Invalid input"
+    get:
+      tags:
+      - "Teacher"
+      summary: "Returns Teacher PopularityScore"
+      description: ""
+      operationId: "getPopularityScore"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "number"
+            additionalProperties:
+              type: "integer"
+              format: "int32"
+  /Teacher/{TeacherId}:
+    get:
+      tags:
+      - "Teacher"
+      summary: "Find Teacher by ID"
+      description: "Returns a single Teacher"
+      operationId: "getTeacherById"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "TeacherId"
+        in: "path"
+        description: "ID of Teacher to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Teacher"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Teacher not found"
+  /Student:
+    post:
+      tags:
+      - "Student"
+      summary: "Create a new Student"
+      description: ""
+      operationId: "CreateStudent"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "The Parameters of a Student"
+        required: true
+        schema:
+          $ref: "#/definitions/Student"
+      responses:
+        "405":
+          description: "Invalid input"
+  /Student/{StudentId}:
+    get:
+      tags:
+      - "Student"
+      summary: "Find Student by ID"
+      description: "Returns a single Student"
+      operationId: "getStudentById"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "StudentId"
+        in: "path"
+        description: "ID of Student to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Student"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Student not found"
+  /Student/Teacher/{TeacherId}/{PopularityScore}:          
+    post:
+      tags:
+      - "Student"
+      summary: "Updates a PopularityScore for a Teacher"
+      description: ""
+      operationId: "updateTeachersPopularityScore"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "TeacherId"
+        in: "path"
+        description: "ID of a Teacher that must have thire PopularityScore updated"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "PopularityScore"
+        in: "path"
+        description: "the new PopularityScore"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "405":
+          description: "Invalid input"
+  /Student/Course/{CourseID}/{PopularityScore}:          
+    post:
+      tags:
+      - "Student"
+      summary: "Updates a PopularityScore for a Teacher"
+      description: ""
+      operationId: "updateCoursePopularityScore"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "CourseID"
+        in: "path"
+        description: "ID of a Course that must have it PopularityScore updated"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "PopularityScore"
+        in: "path"
+        description: "the new PopularityScore"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "405":
+          description: "Invalid input"
+definitions:
+  Course:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        format: "string"
+      Courseid:
+        type: "integer"
+        format: "int64"
+      ECTS:
+        type: "number"
+        format: "int64" 
+      SarisfactoryScore:
+        type: "number"
+        format: "int64"
+      TeacherIDs:
+        type: array
+        items:
+          $ref: '#/definitions/Teacher'
+      StudentIDs:
+        type: array
+        items:
+          $ref: '#/definitions/Student'
+      
+    xml:
+      name: "Course"
+  Student:
+    type: "object"
+    properties:
+      Studnetid:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+    xml:
+      name: "Category"
+  Teacher:
+    type: "object"
+    properties:
+      Teacherid:
+        type: "integer"
+        format: "int64"
+      Name:
+        type: "integer"
+        format: "int32"
+      PopularityScore:
+        type: "integer"
+        format: "int64"
+    xml:
+      name: "Teacher"
