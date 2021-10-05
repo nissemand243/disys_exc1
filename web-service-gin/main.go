@@ -1,217 +1,123 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
-	"strconv"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gorilla/mux"
 )
 
-type course struct {
-	ID            int      `json:"id"`
-	Name          string   `json:"name"`
-	Workload      int      `json:"workload"`
-	SatisfacScore int      `json:"courseScore"`
-	Teacher       []string `json:"teachers"`
-	Student       []string `json:"students"`
+type Course struct {
+	Name               string   `json"Name"`
+	UID                string   `json:"UID"`
+	ECTS               float64  `json:"ECTS"`
+	StatisfactoryScore float64  `json:"StatisfactoryScore"`
+	TeacherID          []string `json"TeacherID"`
+	StudentID          []string `json"StudentID"`
 }
 
-var courses = []course{
-	{ID: 1, Name: "BDSA", Teacher: []string{"Paolo", "holger"}, Student: []string{"Jens", "peter"}},
-	{ID: 2, Name: "Distributed Systems", Teacher: []string{"Marco", "Laura-langpat"}, Student: []string{"Henning", "GOKKE-JOKKE"}},
+var Courses = []Course{
+	{UID: "1", Name: "BDSA", TeacherID: []string{"Palo2", "Rasmus34"}, StudentID: []string{"Mads123213", "Alexander7374", "Anton8888", "Jack999"}},
+	{UID: "2", Name: "Distributed Systems", TeacherID: []string{"Marco1"}, StudentID: []string{"Mads123213", "Alexander7374", "Anton8888", "Jack999", "Henning69"}},
 }
 
 func main() {
-	router := gin.Default()
-	router.GET("/courses", getCourses)
-	router.GET("/courses/:id", getCourseByID)
-	router.POST("/courses", postCourse)
-	router.POST("/courses/student/:id/:name", addStudent)
-	router.POST("/courses/teacher/:id/:name", addTeacher)
-	router.DELETE("/courses/student/:id/:name", deleteStudent)
-	router.DELETE("/courses/teacher/:id/:name", deleteTeacher)
-	router.PUT("/courses/score/:id/:score", updateScore)
-	router.PUT("/courses/workload/:id/:workload", updateWorkload)
 
-	router.Run("localhost:8080")
-}
-
-func getCourses(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, courses)
-}
-
-// postCourse adds a course from JSON received in the request body.
-func postCourse(c *gin.Context) {
-	var newCourse course
-
-	// Call BindJSON to bind the received JSON to
-	// newCourse.
-	if err := c.BindJSON(&newCourse); err != nil {
-		return
-	}
-
-	//check if course allready exists in the server
-	if check(newCourse) {
-
-		c.IndentedJSON(http.StatusAlreadyReported, "Course allready exists")
-	} else {
-		// Add the new course to the slice.
-		courses = append(courses, newCourse)
-		c.IndentedJSON(http.StatusCreated, newCourse)
-	}
+	handleRequest()
 
 }
 
-func check(newCourse course) bool {
-	var checkBool bool
-	for _, a := range courses {
-		if a.ID == newCourse.ID && a.Name == newCourse.Name {
-			checkBool = true
-			break
-		} else {
-			checkBool = false
-		}
-	}
-	return checkBool
-}
+func handleRequest() {
+	router := mux.NewRouter().StrictSlash(true)
 
-// getCourseByID locates the course whose ID value matches the id
-// parameter sent by the client, then returns that course as a response.
-func getCourseByID(c *gin.Context) {
-	id := c.Param("id")
-	index, _ := strconv.Atoi(id)
-	// Loop over the list of courses, looking for
-	// a course whose ID value matches the parameter.
-	for _, a := range courses {
-		if a.ID == index {
-			c.IndentedJSON(http.StatusOK, a)
-			return
-		}
-	}
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "course not found"})
-}
+	router.HandleFunc("/", TestRouter).Methods("GET")
+	router.HandleFunc("/Course", CreateCourse).Methods("POST")
+	router.HandleFunc("/Course", GetCourses).Methods("GET")
+	router.HandleFunc("/Course/Teacher/{id}/{TeacherId}", AddTeacher).Methods("POST")
+	router.HandleFunc("/Course/Teacher/{id}/{TeacherId}", DeleteTeacher).Methods("DELETE")
+	router.HandleFunc("/Course/Student/{id}/{StudentId}", AddStudent).Methods("POST")
+	router.HandleFunc("/Course/Student/{id}/{StudentId}", DeleteStudent).Methods("DELETE")
+	router.HandleFunc("/Course/ECTS/{id}/{ECTS}", UpdateECTS).Methods("PUT")
 
-func deleteStudent(c *gin.Context) {
-	id := c.Params.ByName("id")
-	name := c.Params.ByName("name")
-	index, _ := strconv.Atoi(id)
-	var newArr []string
-	var deleted string
-
-	for i := 0; i < len(courses); i++ {
-		if courses[i].ID == index {
-			for j := 0; j < len(courses[i].Student); j++ {
-				if courses[i].Student[j] == name {
-					deleted = courses[i].Student[j]
-				} else {
-					newArr = append(newArr, courses[i].Student[j])
-				}
-			}
-			courses[i].Student = newArr
-		}
-	}
-
-	c.IndentedJSON(http.StatusOK, deleted)
-}
-
-func deleteTeacher(c *gin.Context) {
-	id := c.Params.ByName("id")
-	name := c.Params.ByName("name")
-	index, _ := strconv.Atoi(id)
-	var newArr []string
-	var deleted string
-
-	for i := 0; i < len(courses); i++ {
-		if courses[i].ID == index {
-			for j := 0; j < len(courses[i].Teacher); j++ {
-				if courses[i].Teacher[j] == name {
-					deleted = courses[i].Teacher[j]
-				} else {
-					newArr = append(newArr, courses[i].Teacher[j])
-				}
-			}
-			courses[i].Teacher = newArr
-		}
-	}
-
-	c.IndentedJSON(http.StatusOK, deleted)
-}
-
-func addStudent(c *gin.Context) {
-	id := c.Params.ByName("id")
-	name := c.Params.ByName("name")
-	index, _ := strconv.Atoi(id)
-
-	for i := 0; i < len(courses); i++ {
-		if courses[i].ID == index {
-			courses[i].Student = append(courses[i].Student, name)
-		}
-	}
-
-	c.IndentedJSON(http.StatusOK, name)
-}
-
-func addTeacher(c *gin.Context) {
-	id := c.Params.ByName("id")
-	name := c.Params.ByName("name")
-	index, _ := strconv.Atoi(id)
-
-	for i := 0; i < len(courses); i++ {
-		if courses[i].ID == index {
-			courses[i].Teacher = append(courses[i].Teacher, name)
-		}
-	}
-	c.IndentedJSON(http.StatusOK, name)
-}
-
-func updateScore(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Params.ByName("id"))
-
-	score, _ := strconv.Atoi(c.Params.ByName("score"))
-	for i := 0; i < len(courses); i++ {
-		if courses[i].ID == id {
-			courses[i].SatisfacScore = score
-			c.IndentedJSON(http.StatusOK, courses[i])
-		}
-	}
+	log.Fatal(http.ListenAndServe(":8000", router))
 
 }
+func courseSevers() {
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/", TestRouter).Methods("GET")
+	router.HandleFunc("/Course", CreateCourse).Methods("POST")
+	router.HandleFunc("/Course", GetCourses).Methods("GET")
+	log.Fatal(http.ListenAndServe(":8000", router))
 
-func updateWorkload(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Params.ByName("id"))
-	workload, _ := strconv.Atoi(c.Params.ByName("workload"))
-
-	for i := 0; i < len(courses); i++ {
-		if courses[i].ID == id {
-			courses[i].Workload = workload
-			c.IndentedJSON(http.StatusOK, courses[i])
-		}
-	}
+}
+func teacherServers() {
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/Course/Teacher/{id}/{TeacherId}", AddTeacher).Methods("POST")
+	router.HandleFunc("/Course/Teacher/{id}/{TeacherId}", DeleteTeacher).Methods("DELETE")
+	log.Fatal(http.ListenAndServe(":8001", router))
+}
+func studentServers() {
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/Course/Student/{id}/{StudentId}", AddStudent).Methods("POST")
+	router.HandleFunc("/Course/Student/{id}/{StudentId}", DeleteStudent).Methods("DELETE")
+	log.Fatal(http.ListenAndServe(":8002", router))
+}
+func otherServers() {
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/Course/ECTS/{id}/{ECTS}", UpdateECTS).Methods("PUT")
+	log.Fatal(http.ListenAndServe(":8003", router))
 }
 
-// GET ALL COURSES USING CMD
-// curl http://localhost:8080/courses
+func TestRouter(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Endpoint called: TestRouter()")
+}
+func CreateCourse(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(w, "Function called: CreateCourse()")
 
-// GET COURSE BY ID USING CMD
-// curl http://localhost8080/courses/2
+	var course Course
+	_ = json.NewDecoder(r.Body).Decode(&course)
 
-//adding into slice via CMD ...... ONLY CMD!!!!!!! - with arrays
-// curl http://localhost:8080/courses --include --Header "Content-Type:application/json" --request "POST" --data "{\"id\": 4, \"name\": \"The Modern Sound of Betty Carter\", \"teachers\":[\"Betty-Carter\",\"kurt\"], \"students\":[\"Heino\",\"kent\"]}"
+	Courses = append(Courses, course)
 
-//DELETE STUDENT USIGN CMD
-// curl http://localhost:8080/courses/student/2/Henning --Header "Content-Type:application/json" --request "DELETE"
+	json.NewEncoder(w).Encode(course)
+}
+func GetCourses(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(w, "Function called: GetCourses()")
+	json.NewEncoder(w).Encode(Courses)
 
-//DELETE TEACHER USING CMD
-// curl http://localhost:8080/courses/teacher/2/Marco --Header "Content-Type:application/json" --request "DELETE"
+}
+func AddTeacher(w http.ResponseWriter, r *http.Request) {
 
-// ENROLL STUDENT TO COURSE USING CMD
-// curl http://localhost:8080/courses/student/2/HOLGER --Header "Content-Type:application/json" --request "POST"
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(w, "Function called: AddTeacher()\n")
+	fmt.Fprint(w, "Not implementet Hello world")
+}
 
-// ENROLL TEACHER TO COUSE USING CMD
-// curl http://localhost:8080/courses/teacher/2/Jytte --Header "Content-Type:application/json" --request "POST"
+func DeleteTeacher(w http.ResponseWriter, r *http.Request) {
 
-// UPDATE COURSE SCORE USING CMD
-// curl http://localhost:8080/courses/score/2/10 --Header "Content-Type:application/json" --request "PUT"
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(w, "Function called: DeleteTeacher()\n")
+	fmt.Fprint(w, "Not implementet Hello world")
+}
+func AddStudent(w http.ResponseWriter, r *http.Request) {
 
-// UPDATE COURSE WORKLOAD USING CMD
-// curl http://localhost:8080/courses/workload/2/100 --Header "Content-Type:application/json" --request "PUT"
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(w, "Function called: AddStudent()\n")
+	fmt.Fprint(w, "Not implementet Hello world")
+}
+func DeleteStudent(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(w, "Function called: DeleteStudent()\n")
+	fmt.Fprint(w, "Not implementet Hello world")
+}
+func UpdateECTS(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(w, "Function called: UpdateECTS()\n")
+	fmt.Fprint(w, "Not implementet Hello world")
+}
